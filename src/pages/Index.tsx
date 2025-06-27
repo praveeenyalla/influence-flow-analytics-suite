@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
-import { TrendingUp, TrendingDown, Users, MessageSquare, Heart, Share2, Eye, Calendar, Download, Filter, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, MessageSquare, Heart, Share2, Eye, Calendar, Download, Filter, RefreshCw, UserPlus } from "lucide-react";
+import ProfileCard from "@/components/ProfileCard";
+import AddProfileModal from "@/components/AddProfileModal";
 
 const Index = () => {
   const [selectedPlatform, setSelectedPlatform] = useState("all");
+  const [profiles, setProfiles] = useState<any[]>([]);
   
   // Mock data for demonstration
   const overviewStats = [
@@ -51,6 +53,14 @@ const Index = () => {
     { id: 3, platform: "LinkedIn", content: "Industry insights article", likes: 892, comments: 45, shares: 67 },
   ];
 
+  const handleAddProfile = (profileData: any) => {
+    setProfiles([...profiles, profileData]);
+  };
+
+  const handleDeleteProfile = (profileId: string) => {
+    setProfiles(profiles.filter(profile => profile.id !== profileId));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -59,9 +69,10 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">Social Media Dashboard</h1>
-              <p className="text-slate-400">Comprehensive analytics and insights</p>
+              <p className="text-slate-400">Comprehensive analytics and revenue tracking</p>
             </div>
             <div className="flex items-center gap-3">
+              <AddProfileModal onAddProfile={handleAddProfile} />
               <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
@@ -117,6 +128,9 @@ const Index = () => {
           <TabsList className="bg-slate-800/50 border-slate-700">
             <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="profiles" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Profiles ({profiles.length})
             </TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               Analytics
@@ -218,6 +232,31 @@ const Index = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="profiles" className="space-y-6">
+            {profiles.length === 0 ? (
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <UserPlus className="h-16 w-16 text-slate-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No Profiles Added Yet</h3>
+                  <p className="text-slate-400 text-center mb-6 max-w-md">
+                    Start by adding social media profiles to track their revenue and performance across different platforms.
+                  </p>
+                  <AddProfileModal onAddProfile={handleAddProfile} />
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {profiles.map((profile) => (
+                  <ProfileCard
+                    key={profile.id}
+                    profile={profile}
+                    onDelete={handleDeleteProfile}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
